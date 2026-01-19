@@ -1,0 +1,12 @@
+<div class="mb-6">
+  <%= link_to @skill, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+    &larr; Back to <%= @skill.name %>
+  <% end %>
+</div>
+
+<div class="bg-white shadow sm:rounded-lg">
+  <div class="px-4 py-5 sm:p-6">
+    <h1 class="text-lg font-medium leading-6 text-gray-900 mb-6">Edit Skill</h1>
+    <%= render 'form' %>
+  </div>
+</div>

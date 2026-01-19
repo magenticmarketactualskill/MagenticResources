@@ -1,0 +1,175 @@
+<div class="mb-6">
+  <%= link_to resources_path, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+    &larr; Back to Resources
+  <% end %>
+</div>
+
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 flex justify-between items-start">
+    <div class="flex items-center">
+      <% if @resource.human? %>
+        <span class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100">
+          <span class="text-2xl font-medium text-indigo-600"><%= @resource.name[0..1].upcase %></span>
+        </span>
+      <% else %>
+        <span class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
+          <svg class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+          </svg>
+        </span>
+      <% end %>
+      <div class="ml-4">
+        <h1 class="text-2xl font-bold text-gray-900"><%= @resource.name %></h1>
+        <p class="text-sm text-gray-500"><%= @resource.display_type %></p>
+      </div>
+    </div>
+    <div class="flex space-x-3">
+      <%= link_to "Edit", edit_resource_path(@resource), class: "inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" %>
+      <%= button_to "Delete", @resource, method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500" %>
+    </div>
+  </div>
+
+  <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+    <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Status</dt>
+        <dd class="mt-1">
+          <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= @resource.available? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+            <%= @resource.status.humanize %>
+          </span>
+        </dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Email</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @resource.email || "Not set" %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Capacity</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @resource.capacity_hours %> hours/week</dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Availability</dt>
+        <dd class="mt-1 text-sm text-gray-900">
+          <%= @resource.available_hours.round(1) %> hours available
+          (<%= @resource.availability_percentage %>%)
+        </dd>
+      </div>
+      <% if @resource.hourly_rate %>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Hourly Rate</dt>
+          <dd class="mt-1 text-sm text-gray-900">$<%= number_with_precision(@resource.hourly_rate, precision: 2) %></dd>
+        </div>
+      <% end %>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Timezone</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @resource.timezone %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <% if @resource.description.present? %>
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <dt class="text-sm font-medium text-gray-500 mb-2">Description</dt>
+      <dd class="text-sm text-gray-900"><%= @resource.description %></dd>
+    </div>
+  <% end %>
+</div>
+
+<!-- Skills -->
+<div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+    <h3 class="text-lg font-medium leading-6 text-gray-900">Skills</h3>
+  </div>
+  <% if @skills.any? %>
+    <ul role="list" class="divide-y divide-gray-200">
+      <% @skills.each do |rs| %>
+        <li class="px-4 py-4 sm:px-6 flex items-center justify-between">
+          <div>
+            <%= link_to rs.skill.name, rs.skill, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
+            <p class="text-sm text-gray-500"><%= rs.skill.category&.humanize %></p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-800">
+              <%= rs.proficiency_label %>
+            </span>
+            <% if rs.certified? %>
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-100 text-green-800">
+                Certified
+              </span>
+            <% end %>
+            <% if rs.years_experience && rs.years_experience > 0 %>
+              <span class="text-sm text-gray-500"><%= rs.years_experience %> years</span>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="px-4 py-8 text-center text-gray-500">
+      No skills assigned yet.
+    </div>
+  <% end %>
+</div>
+
+<!-- Teams -->
+<div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+    <h3 class="text-lg font-medium leading-6 text-gray-900">Teams</h3>
+  </div>
+  <% if @teams.any? %>
+    <ul role="list" class="divide-y divide-gray-200">
+      <% @teams.each do |tm| %>
+        <li class="px-4 py-4 sm:px-6 flex items-center justify-between">
+          <div>
+            <%= link_to tm.team.name, tm.team, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
+            <p class="text-sm text-gray-500"><%= tm.team.team_type.humanize %></p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-800">
+              <%= tm.role_label %>
+            </span>
+            <span class="text-sm text-gray-500">Since <%= tm.joined_at&.strftime("%b %Y") %></span>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="px-4 py-8 text-center text-gray-500">
+      Not a member of any teams.
+    </div>
+  <% end %>
+</div>
+
+<!-- Assignments -->
+<div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+    <h3 class="text-lg font-medium leading-6 text-gray-900">Project Assignments</h3>
+  </div>
+  <% if @assignments.any? %>
+    <ul role="list" class="divide-y divide-gray-200">
+      <% @assignments.each do |assignment| %>
+        <li class="px-4 py-4 sm:px-6 flex items-center justify-between">
+          <div>
+            <%= link_to assignment.project.name, assignment.project, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
+            <p class="text-sm text-gray-500">
+              <%= assignment.role || "Team Member" %>
+              <% if assignment.start_date && assignment.end_date %>
+                &middot; <%= assignment.start_date.strftime("%b %d") %> - <%= assignment.end_date.strftime("%b %d, %Y") %>
+              <% end %>
+            </p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="text-sm font-medium text-gray-900"><%= assignment.allocation_percentage %>%</span>
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= assignment.active? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+              <%= assignment.status.humanize %>
+            </span>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="px-4 py-8 text-center text-gray-500">
+      No project assignments.
+    </div>
+  <% end %>
+</div>

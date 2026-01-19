@@ -1,0 +1,56 @@
+<div class="sm:flex sm:items-center sm:justify-between mb-8">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900">Teams</h1>
+    <p class="mt-1 text-sm text-gray-500">Organize resources into collaborative teams</p>
+  </div>
+  <div class="mt-4 sm:mt-0">
+    <%= link_to new_team_path, class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" do %>
+      <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+      </svg>
+      Create Team
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  <% @teams.each do |team| %>
+    <%= link_to team, class: "block" do %>
+      <div class="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-medium text-gray-900"><%= team.name %></h3>
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-800">
+              <%= team.team_type.humanize %>
+            </span>
+          </div>
+          <% if team.description.present? %>
+            <p class="text-sm text-gray-500 line-clamp-2 mb-4"><%= team.description %></p>
+          <% end %>
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center space-x-4">
+              <span class="text-indigo-600"><%= team.human_count %> humans</span>
+              <span class="text-purple-600"><%= team.ai_count %> AI agents</span>
+            </div>
+            <span class="text-gray-500"><%= team.member_count %> total</span>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
+<% if @teams.empty? %>
+  <div class="text-center py-12">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+    <h3 class="mt-2 text-sm font-semibold text-gray-900">No teams</h3>
+    <p class="mt-1 text-sm text-gray-500">Create a team to organize your resources.</p>
+    <div class="mt-6">
+      <%= link_to new_team_path, class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" do %>
+        Create Team
+      <% end %>
+    </div>
+  </div>
+<% end %>

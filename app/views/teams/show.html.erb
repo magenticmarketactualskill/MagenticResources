@@ -1,0 +1,117 @@
+<div class="mb-6">
+  <%= link_to teams_path, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+    &larr; Back to Teams
+  <% end %>
+</div>
+
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 flex justify-between items-start">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900"><%= @team.name %></h1>
+      <p class="mt-1 text-sm text-gray-500"><%= @team.team_type.humanize %> &middot; Owned by <%= @team.owner.display_name %></p>
+    </div>
+    <div class="flex space-x-3">
+      <%= link_to "Edit", edit_team_path(@team), class: "inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" %>
+      <%= button_to "Delete", @team, method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500" %>
+    </div>
+  </div>
+
+  <% if @team.description.present? %>
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <p class="text-sm text-gray-900"><%= @team.description %></p>
+    </div>
+  <% end %>
+
+  <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+    <dl class="grid grid-cols-3 gap-4">
+      <div class="text-center">
+        <dt class="text-sm font-medium text-gray-500">Total Members</dt>
+        <dd class="mt-1 text-2xl font-semibold text-gray-900"><%= @team.member_count %></dd>
+      </div>
+      <div class="text-center">
+        <dt class="text-sm font-medium text-gray-500">Humans</dt>
+        <dd class="mt-1 text-2xl font-semibold text-indigo-600"><%= @team.human_count %></dd>
+      </div>
+      <div class="text-center">
+        <dt class="text-sm font-medium text-gray-500">AI Agents</dt>
+        <dd class="mt-1 text-2xl font-semibold text-purple-600"><%= @team.ai_count %></dd>
+      </div>
+    </dl>
+  </div>
+</div>
+
+<!-- Team Members -->
+<div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
+    <h3 class="text-lg font-medium leading-6 text-gray-900">Team Members</h3>
+  </div>
+  <% if @memberships.any? %>
+    <ul role="list" class="divide-y divide-gray-200">
+      <% @memberships.each do |membership| %>
+        <li class="px-4 py-4 sm:px-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <% if membership.resource.human? %>
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
+                  <span class="text-sm font-medium text-indigo-600"><%= membership.resource.name[0..1].upcase %></span>
+                </span>
+              <% else %>
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
+                  <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                  </svg>
+                </span>
+              <% end %>
+              <div class="ml-4">
+                <%= link_to membership.resource.name, membership.resource, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
+                <p class="text-sm text-gray-500"><%= membership.resource.display_type %></p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-800">
+                <%= membership.role_label %>
+              </span>
+              <%= button_to "Remove", remove_member_team_path(@team, resource_id: membership.resource.id), method: :delete, data: { turbo_confirm: "Remove #{membership.resource.name} from the team?" }, class: "text-sm text-red-600 hover:text-red-500" %>
+            </div>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="px-4 py-8 text-center text-gray-500">
+      No members yet.
+    </div>
+  <% end %>
+</div>
+
+<!-- Add Member -->
+<% if @available_resources.any? %>
+<div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+    <h3 class="text-lg font-medium leading-6 text-gray-900">Add Member</h3>
+  </div>
+  <div class="px-4 py-5 sm:px-6">
+    <%= form_with url: add_member_team_path(@team), method: :post, class: "flex items-end space-x-4" do |f| %>
+      <div class="flex-1">
+        <label for="resource_id" class="block text-sm font-medium text-gray-700">Resource</label>
+        <select name="resource_id" id="resource_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border">
+          <% @available_resources.each do |resource| %>
+            <option value="<%= resource.id %>"><%= resource.name %> (<%= resource.display_type %>)</option>
+          <% end %>
+        </select>
+      </div>
+      <div>
+        <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+        <select name="role" id="role" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border">
+          <% TeamMembership.roles.keys.each do |role| %>
+            <option value="<%= role %>"><%= role.titleize %></option>
+          <% end %>
+        </select>
+      </div>
+      <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+        Add Member
+      </button>
+    <% end %>
+  </div>
+</div>
+<% end %>

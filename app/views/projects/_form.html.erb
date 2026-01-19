@@ -1,0 +1,62 @@
+<%= form_with model: @project, class: "space-y-6" do |f| %>
+  <% if @project.errors.any? %>
+    <div class="rounded-md bg-red-50 p-4">
+      <ul class="list-disc list-inside text-sm text-red-700">
+        <% @project.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div class="sm:col-span-2">
+      <%= f.label :name, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border", required: true %>
+    </div>
+
+    <div>
+      <%= f.label :status, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.select :status, Project.statuses.keys.map { |s| [s.humanize, s] }, {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+    </div>
+
+    <div>
+      <%= f.label :priority, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.select :priority, Project.priorities.keys.map { |p| [p.humanize, p] }, {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+    </div>
+
+    <div>
+      <%= f.label :start_date, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.date_field :start_date, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+    </div>
+
+    <div>
+      <%= f.label :end_date, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.date_field :end_date, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :description, class: "block text-sm font-medium text-gray-700" %>
+    <%= f.text_area :description, rows: 4, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+  </div>
+
+  <fieldset class="border border-gray-200 rounded-md p-4">
+    <legend class="text-sm font-medium text-gray-700 px-2">External Integration (Optional)</legend>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-2">
+      <div>
+        <%= f.label :external_system, "External System", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :external_system, placeholder: "e.g., CollaborativeKanBan", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+      </div>
+      <div>
+        <%= f.label :external_id, "External ID", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :external_id, placeholder: "e.g., board-123", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="flex justify-end space-x-3">
+    <%= link_to "Cancel", @project.persisted? ? @project : projects_path, class: "rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" %>
+    <%= f.submit @project.persisted? ? "Update Project" : "Create Project", class: "rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
+  </div>
+<% end %>

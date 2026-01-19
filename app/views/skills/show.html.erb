@@ -1,0 +1,72 @@
+<div class="mb-6">
+  <%= link_to skills_path, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+    &larr; Back to Skills
+  <% end %>
+</div>
+
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 flex justify-between items-start">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900"><%= @skill.name %></h1>
+      <p class="mt-1 text-sm text-gray-500"><%= @skill.category&.humanize %></p>
+    </div>
+    <div class="flex space-x-3">
+      <%= link_to "Edit", edit_skill_path(@skill), class: "inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" %>
+      <%= button_to "Delete", @skill, method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500" %>
+    </div>
+  </div>
+
+  <% if @skill.description.present? %>
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <p class="text-sm text-gray-900"><%= @skill.description %></p>
+    </div>
+  <% end %>
+</div>
+
+<div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+    <h3 class="text-lg font-medium leading-6 text-gray-900">Resources with this skill (<%= @resources.count %>)</h3>
+  </div>
+  <% if @resources.any? %>
+    <ul role="list" class="divide-y divide-gray-200">
+      <% @resources.each do |resource| %>
+        <% rs = resource.resource_skills.find_by(skill: @skill) %>
+        <li class="px-4 py-4 sm:px-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <% if resource.human? %>
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
+                  <span class="text-sm font-medium text-indigo-600"><%= resource.name[0..1].upcase %></span>
+                </span>
+              <% else %>
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
+                  <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                  </svg>
+                </span>
+              <% end %>
+              <div class="ml-4">
+                <%= link_to resource.name, resource, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
+                <p class="text-sm text-gray-500"><%= resource.display_type %></p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-800">
+                <%= rs&.proficiency_label || "Unknown" %>
+              </span>
+              <% if rs&.certified? %>
+                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-100 text-green-800">
+                  Certified
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="px-4 py-8 text-center text-gray-500">
+      No resources have this skill yet.
+    </div>
+  <% end %>
+</div>

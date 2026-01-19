@@ -1,0 +1,86 @@
+<%= form_with model: @resource, class: "space-y-6" do |f| %>
+  <% if @resource.errors.any? %>
+    <div class="rounded-md bg-red-50 p-4">
+      <div class="flex">
+        <div class="shrink-0">
+          <svg class="size-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800"><%= pluralize(@resource.errors.count, "error") %> prohibited this resource from being saved:</h3>
+          <ul class="mt-2 list-disc list-inside text-sm text-red-700">
+            <% @resource.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div>
+      <%= f.label :name, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border", required: true %>
+    </div>
+
+    <div>
+      <%= f.label :resource_type, "Type", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.select :resource_type, Resource.resource_types.keys.map { |t| [t.humanize, t] }, {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+    </div>
+
+    <div>
+      <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.email_field :email, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+    </div>
+
+    <div>
+      <%= f.label :status, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.select :status, Resource.statuses.keys.map { |s| [s.humanize, s] }, {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+    </div>
+
+    <div>
+      <%= f.label :capacity_hours, "Weekly Capacity (hours)", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.number_field :capacity_hours, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border", min: 0, max: 168 %>
+    </div>
+
+    <div>
+      <%= f.label :hourly_rate, "Hourly Rate ($)", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.number_field :hourly_rate, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border", min: 0, step: 0.01 %>
+    </div>
+
+    <div>
+      <%= f.label :timezone, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.select :timezone, ActiveSupport::TimeZone.all.map { |tz| [tz.to_s, tz.name] }, { selected: @resource.timezone || "UTC" }, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :description, class: "block text-sm font-medium text-gray-700" %>
+    <%= f.text_area :description, rows: 4, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+  </div>
+
+  <% if @skills.present? %>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Skills</label>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+        <% @skills.each do |skill| %>
+          <label class="relative flex items-start py-2">
+            <div class="min-w-0 flex-1 text-sm">
+              <input type="checkbox" name="skill_ids[]" value="<%= skill.id %>"
+                     <%= 'checked' if @resource.skills.include?(skill) %>
+                     class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2">
+              <span class="font-medium text-gray-700"><%= skill.name %></span>
+            </div>
+          </label>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="flex justify-end space-x-3">
+    <%= link_to "Cancel", @resource.persisted? ? @resource : resources_path, class: "rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" %>
+    <%= f.submit @resource.persisted? ? "Update Resource" : "Create Resource", class: "rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
+  </div>
+<% end %>

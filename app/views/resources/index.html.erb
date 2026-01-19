@@ -1,0 +1,100 @@
+<div class="sm:flex sm:items-center sm:justify-between mb-8">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900">Resources</h1>
+    <p class="mt-1 text-sm text-gray-500">Manage your talent pool of humans and AI agents</p>
+  </div>
+  <div class="mt-4 sm:mt-0">
+    <%= link_to new_resource_path, class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" do %>
+      <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+      </svg>
+      Add Resource
+    <% end %>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="mb-6 flex flex-wrap gap-4">
+  <%= link_to "All", resources_path, class: "rounded-md px-3 py-2 text-sm font-medium #{params[:type].blank? && params[:status].blank? ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}" %>
+  <%= link_to "Humans", resources_path(type: 'human'), class: "rounded-md px-3 py-2 text-sm font-medium #{params[:type] == 'human' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}" %>
+  <%= link_to "AI Agents", resources_path(type: 'ai_agent'), class: "rounded-md px-3 py-2 text-sm font-medium #{params[:type] == 'ai_agent' ? 'bg-purple-100 text-purple-700' : 'text-gray-500 hover:text-gray-700'}" %>
+  <span class="text-gray-300">|</span>
+  <%= link_to "Available", resources_path(status: 'available'), class: "rounded-md px-3 py-2 text-sm font-medium #{params[:status] == 'available' ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:text-gray-700'}" %>
+</div>
+
+<div class="bg-white shadow overflow-hidden sm:rounded-md">
+  <ul role="list" class="divide-y divide-gray-200">
+    <% @resources.each do |resource| %>
+      <li>
+        <%= link_to resource, class: "block hover:bg-gray-50" do %>
+          <div class="px-4 py-4 sm:px-6">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <% if resource.human? %>
+                  <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
+                    <span class="text-lg font-medium text-indigo-600"><%= resource.name[0..1].upcase %></span>
+                  </span>
+                <% else %>
+                  <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
+                    <svg class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                    </svg>
+                  </span>
+                <% end %>
+                <div class="ml-4">
+                  <p class="text-sm font-medium text-indigo-600"><%= resource.name %></p>
+                  <p class="text-sm text-gray-500"><%= resource.display_type %> &middot; <%= resource.email %></p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-4">
+                <div class="text-right">
+                  <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= resource.available? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+                    <%= resource.status.humanize %>
+                  </span>
+                  <p class="mt-1 text-xs text-gray-500"><%= resource.capacity_hours %>h/week capacity</p>
+                </div>
+                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+            <% if resource.skills.any? %>
+              <div class="mt-2">
+                <div class="flex flex-wrap gap-1">
+                  <% resource.skills.limit(5).each do |skill| %>
+                    <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
+                      <%= skill.name %>
+                    </span>
+                  <% end %>
+                  <% if resource.skills.count > 5 %>
+                    <span class="inline-flex items-center px-2 py-1 text-xs text-gray-500">
+                      +<%= resource.skills.count - 5 %> more
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
+<% if @resources.empty? %>
+  <div class="text-center py-12">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+    <h3 class="mt-2 text-sm font-semibold text-gray-900">No resources</h3>
+    <p class="mt-1 text-sm text-gray-500">Get started by adding a human or AI agent.</p>
+    <div class="mt-6">
+      <%= link_to new_resource_path, class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" do %>
+        <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+        </svg>
+        Add Resource
+      <% end %>
+    </div>
+  </div>
+<% end %>

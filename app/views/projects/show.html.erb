@@ -1,0 +1,151 @@
+<div class="mb-6">
+  <%= link_to projects_path, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+    &larr; Back to Projects
+  <% end %>
+</div>
+
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 flex justify-between items-start">
+    <div>
+      <div class="flex items-center">
+        <h1 class="text-2xl font-bold text-gray-900"><%= @project.name %></h1>
+        <span class="ml-3 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+          <%= case @project.status
+              when 'active' then 'bg-green-100 text-green-800'
+              when 'completed' then 'bg-blue-100 text-blue-800'
+              when 'on_hold' then 'bg-yellow-100 text-yellow-800'
+              when 'cancelled' then 'bg-red-100 text-red-800'
+              else 'bg-gray-100 text-gray-800'
+              end %>">
+          <%= @project.status.humanize %>
+        </span>
+      </div>
+      <p class="mt-1 text-sm text-gray-500">
+        <%= @project.priority.humanize %> priority
+        <% if @project.owner %>
+          &middot; Owned by <%= @project.owner.display_name %>
+        <% end %>
+      </p>
+    </div>
+    <div class="flex space-x-3">
+      <%= link_to "Edit", edit_project_path(@project), class: "inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" %>
+      <%= button_to "Delete", @project, method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500" %>
+    </div>
+  </div>
+
+  <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+    <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Start Date</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @project.start_date&.strftime("%B %d, %Y") || "Not set" %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">End Date</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @project.end_date&.strftime("%B %d, %Y") || "Not set" %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Duration</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @project.duration_days ? "#{@project.duration_days} days" : "N/A" %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Progress</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @project.progress_percentage %>%</dd>
+      </div>
+    </dl>
+  </div>
+
+  <% if @project.description.present? %>
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <dt class="text-sm font-medium text-gray-500 mb-2">Description</dt>
+      <dd class="text-sm text-gray-900"><%= @project.description %></dd>
+    </div>
+  <% end %>
+
+  <% if @project.synced_from_external? %>
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+        Synced from <%= @project.external_system %>: <%= @project.external_id %>
+      </span>
+    </div>
+  <% end %>
+</div>
+
+<!-- Resource Stats -->
+<div class="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
+  <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+    <dt class="truncate text-sm font-medium text-gray-500">Total Resources</dt>
+    <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"><%= @project.resources.count %></dd>
+  </div>
+  <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+    <dt class="truncate text-sm font-medium text-gray-500">Humans</dt>
+    <dd class="mt-1 text-3xl font-semibold tracking-tight text-indigo-600"><%= @project.human_resources.count %></dd>
+  </div>
+  <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+    <dt class="truncate text-sm font-medium text-gray-500">AI Agents</dt>
+    <dd class="mt-1 text-3xl font-semibold tracking-tight text-purple-600"><%= @project.ai_resources.count %></dd>
+  </div>
+</div>
+
+<!-- Assignments -->
+<div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
+    <h3 class="text-lg font-medium leading-6 text-gray-900">Resource Assignments</h3>
+    <% if @available_resources.any? %>
+      <%= link_to new_project_assignment_path(@project), class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" do %>
+        Assign Resource
+      <% end %>
+    <% end %>
+  </div>
+  <% if @assignments.any? %>
+    <ul role="list" class="divide-y divide-gray-200">
+      <% @assignments.each do |assignment| %>
+        <li class="px-4 py-4 sm:px-6" id="<%= dom_id(assignment) %>">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <% if assignment.resource.human? %>
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
+                  <span class="text-sm font-medium text-indigo-600"><%= assignment.resource.name[0..1].upcase %></span>
+                </span>
+              <% else %>
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
+                  <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                  </svg>
+                </span>
+              <% end %>
+              <div class="ml-4">
+                <%= link_to assignment.resource.name, assignment.resource, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
+                <p class="text-sm text-gray-500">
+                  <%= assignment.role || "Team Member" %>
+                  <% if assignment.start_date && assignment.end_date %>
+                    &middot; <%= assignment.start_date.strftime("%b %d") %> - <%= assignment.end_date.strftime("%b %d") %>
+                  <% end %>
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="text-right">
+                <span class="text-sm font-medium text-gray-900"><%= assignment.allocation_percentage %>%</span>
+                <p class="text-xs text-gray-500"><%= assignment.allocated_hours.round(1) %>h/week</p>
+              </div>
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= assignment.active? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+                <%= assignment.status.humanize %>
+              </span>
+              <div class="flex space-x-2">
+                <%= link_to "Edit", edit_project_assignment_path(@project, assignment), class: "text-sm text-gray-600 hover:text-gray-500" %>
+                <%= button_to "Remove", project_assignment_path(@project, assignment), method: :delete, data: { turbo_confirm: "Remove #{assignment.resource.name} from the project?" }, class: "text-sm text-red-600 hover:text-red-500" %>
+              </div>
+            </div>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="px-4 py-8 text-center text-gray-500">
+      No resources assigned yet.
+      <% if @available_resources.any? %>
+        <%= link_to "Assign one", new_project_assignment_path(@project), class: "text-indigo-600 hover:text-indigo-500" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

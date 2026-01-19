@@ -1,0 +1,80 @@
+<div class="mb-6">
+  <%= link_to @project, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+    &larr; Back to <%= @project.name %>
+  <% end %>
+</div>
+
+<div class="bg-white shadow sm:rounded-lg">
+  <div class="px-4 py-5 sm:p-6">
+    <h1 class="text-lg font-medium leading-6 text-gray-900 mb-6">Edit Assignment: <%= @assignment.resource.name %></h1>
+
+    <%= form_with model: [@project, @assignment], class: "space-y-6" do |f| %>
+      <% if @assignment.errors.any? %>
+        <div class="rounded-md bg-red-50 p-4">
+          <ul class="list-disc list-inside text-sm text-red-700">
+            <% @assignment.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="bg-gray-50 rounded-md p-4">
+        <div class="flex items-center">
+          <% if @assignment.resource.human? %>
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
+              <span class="text-sm font-medium text-indigo-600"><%= @assignment.resource.name[0..1].upcase %></span>
+            </span>
+          <% else %>
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
+              <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+              </svg>
+            </span>
+          <% end %>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-900"><%= @assignment.resource.name %></p>
+            <p class="text-sm text-gray-500"><%= @assignment.resource.display_type %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div>
+          <%= f.label :role, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :role, placeholder: "e.g., Developer, Designer, Lead", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+        </div>
+
+        <div>
+          <%= f.label :allocation_percentage, "Allocation (%)", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.number_field :allocation_percentage, min: 1, max: 100, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+        </div>
+
+        <div>
+          <%= f.label :start_date, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.date_field :start_date, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+        </div>
+
+        <div>
+          <%= f.label :end_date, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.date_field :end_date, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+        </div>
+
+        <div>
+          <%= f.label :status, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :status, Assignment.statuses.keys.map { |s| [s.humanize, s] }, {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.label :notes, class: "block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :notes, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border" %>
+      </div>
+
+      <div class="flex justify-end space-x-3">
+        <%= link_to "Cancel", @project, class: "rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" %>
+        <%= f.submit "Update Assignment", class: "rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+</div>

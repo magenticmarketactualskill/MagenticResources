@@ -1,0 +1,64 @@
+<div class="sm:flex sm:items-center sm:justify-between mb-8">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900">Skills</h1>
+    <p class="mt-1 text-sm text-gray-500">Manage the skill taxonomy for your resources</p>
+  </div>
+  <div class="mt-4 sm:mt-0">
+    <%= link_to new_skill_path, class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" do %>
+      <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+      </svg>
+      Add Skill
+    <% end %>
+  </div>
+</div>
+
+<!-- Category Filters -->
+<div class="mb-6 flex flex-wrap gap-2">
+  <%= link_to "All", skills_path, class: "rounded-md px-3 py-2 text-sm font-medium #{params[:category].blank? ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}" %>
+  <% @categories.each do |category| %>
+    <%= link_to category.humanize, skills_path(category: category), class: "rounded-md px-3 py-2 text-sm font-medium #{params[:category] == category ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}" %>
+  <% end %>
+</div>
+
+<div class="bg-white shadow overflow-hidden sm:rounded-md">
+  <ul role="list" class="divide-y divide-gray-200">
+    <% @skills.each do |skill| %>
+      <li>
+        <%= link_to skill, class: "block hover:bg-gray-50" do %>
+          <div class="px-4 py-4 sm:px-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-indigo-600"><%= skill.name %></p>
+                <p class="text-sm text-gray-500"><%= skill.category&.humanize %></p>
+              </div>
+              <div class="flex items-center space-x-4">
+                <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
+                  <%= skill.resource_count %> resources
+                </span>
+                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+            <% if skill.description.present? %>
+              <p class="mt-2 text-sm text-gray-500 line-clamp-2"><%= skill.description %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
+<% if @skills.empty? %>
+  <div class="text-center py-12">
+    <h3 class="mt-2 text-sm font-semibold text-gray-900">No skills</h3>
+    <p class="mt-1 text-sm text-gray-500">Get started by creating a skill.</p>
+    <div class="mt-6">
+      <%= link_to new_skill_path, class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" do %>
+        Add Skill
+      <% end %>
+    </div>
+  </div>
+<% end %>
